@@ -6,64 +6,58 @@ import (
 	"testing"
 )
 
-func TestNewGroceryStore(t *testing.T) {
-	store := newGroceryStore()
+var successTests = []struct {
+	path           string
+	expectedResult int
+}{
+	{"../input1.txt", 7},
+	{"../input2.txt", 13},
+	{"../input3.txt", 6},
+	{"../input4.txt", 9},
+	{"../input5.txt", 11},
+	{"../input8.txt", 50},
+}
 
-	assert.NotNil(t, store)
-	assert.Equal(t, 0, store.NumberOfRegisters)
-	assert.Equal(t, 0, len(store.Customers))
-	assert.Equal(t, 0, len(store.Registers))
+func TestInputs(t *testing.T) {
+	for _, e := range successTests {
+		file, _ := ioutil.ReadFile(e.path)
+		store, _ := Setup(file)
+		result, _ := StartSimulation(store)
+		assert.Equal(t, e.expectedResult, result)
+	}
+}
+
+func TestInvalidCustomerType(t *testing.T) {
+	file, _ := ioutil.ReadFile("../input6.txt")
+	store, _ := Setup(file)
+	_, err := StartSimulation(store)
+	assert.EqualError(t, err, "invalid customer type")
+}
+
+func TestInvalidRegistersNumber(t *testing.T) {
+	file, _ := ioutil.ReadFile("../input7.txt")
+	_, err := Setup(file)
+	assert.EqualError(t, err, "invalid number of registers")
 }
 
 func TestSetup(t *testing.T) {
-	file, err := ioutil.ReadFile("../input1.txt")
-	assert.Nil(t, err)
+	file, _ := ioutil.ReadFile("../input1.txt")
+	setup, _ := Setup(file)
 
-	setup := Setup(file)
 	assert.NotNil(t, setup)
-
 	assert.Equal(t, 1, len(setup.Registers))
-	assert.True(t, setup.Registers[1].InTraining)
 	assert.Equal(t, 0, len(setup.Registers[1].CustomersQueue))
+	assert.True(t, setup.Registers[1].InTraining)
 
 	assert.Equal(t, 2, len(setup.Customers))
 	assert.Equal(t, 1, len(setup.Customers[1]))
+	assert.Equal(t, 1, len(setup.Customers[2]))
 
-	assert.Equal(t, "A", setup.Customers[1][0].CustomerType)
 	assert.Equal(t, 2, setup.Customers[1][0].ItemsQuantity)
-
-	assert.Equal(t, "A", setup.Customers[2][0].CustomerType)
 	assert.Equal(t, 1, setup.Customers[2][0].ItemsQuantity)
 
+	assert.Equal(t, "A", setup.Customers[1][0].CustomerType)
+	assert.Equal(t, "A", setup.Customers[2][0].CustomerType)
+
 	assert.Equal(t, 1, setup.NumberOfRegisters)
-}
-
-func TestInput1(t *testing.T) {
-	file, err := ioutil.ReadFile("../input1.txt")
-	assert.Nil(t, err)
-	assert.Equal(t, 7, StartSimulation(Setup(file)))
-}
-
-func TestInput2(t *testing.T) {
-	file, err := ioutil.ReadFile("../input2.txt")
-	assert.Nil(t, err)
-	assert.Equal(t, 13, StartSimulation(Setup(file)))
-}
-
-func TestInput3(t *testing.T) {
-	file, err := ioutil.ReadFile("../input3.txt")
-	assert.Nil(t, err)
-	assert.Equal(t, 6, StartSimulation(Setup(file)))
-}
-
-func TestInput4(t *testing.T) {
-	file, err := ioutil.ReadFile("../input4.txt")
-	assert.Nil(t, err)
-	assert.Equal(t, 9, StartSimulation(Setup(file)))
-}
-
-func TestInput5(t *testing.T) {
-	file, err := ioutil.ReadFile("../input5.txt")
-	assert.Nil(t, err)
-	assert.Equal(t, 11, StartSimulation(Setup(file)))
 }

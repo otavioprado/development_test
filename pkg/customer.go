@@ -1,5 +1,7 @@
 package pkg
 
+import "errors"
+
 type Customer struct {
 	Id            int
 	CustomerType  string
@@ -9,7 +11,7 @@ type Customer struct {
 	NextTime      int
 }
 
-func (customer *Customer) ChooseRegister(time int, store *GroceryStore) {
+func (customer *Customer) ChooseRegister(time int, store *GroceryStore) error {
 	var register *Register
 	switch ct := customer.CustomerType; ct {
 	case "A":
@@ -19,7 +21,7 @@ func (customer *Customer) ChooseRegister(time int, store *GroceryStore) {
 		register = store.getFewestNumberOfItemsLine()
 		customer.Register = *register
 	default:
-		panic("invalid customer type")
+		return errors.New("invalid customer type")
 	}
 
 	if customer.Register.InTraining {
@@ -29,5 +31,5 @@ func (customer *Customer) ChooseRegister(time int, store *GroceryStore) {
 	}
 
 	store.Registers[register.Id].CustomersQueue = append(store.Registers[register.Id].CustomersQueue, *customer)
+	return nil
 }
-

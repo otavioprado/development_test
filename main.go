@@ -9,11 +9,13 @@ import (
 
 func main() {
 	file, err := ioutil.ReadFile(os.Args[1])
-	if err != nil {
-		panic(err)
-	}
+	pkg.Check(err)
 
-	groceryStore := pkg.Setup(file)
-	timeResult := pkg.StartSimulation(groceryStore)
+	groceryStore, err := pkg.Setup(file)
+	pkg.Check(err)
+
+	timeResult, err := pkg.StartSimulation(groceryStore)
+	pkg.Check(err)
+
 	print(fmt.Sprintf("\nTime result is => %d \n", timeResult))
 }
